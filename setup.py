@@ -32,7 +32,7 @@ setup(name="sportradar",
       packages=find_packages(exclude=['tests']),
       install_requires=["requests"],
       keywords="sportsradar API sports basketball NBA football NFL soccer",
-      python_requires=">=3.*",
+      python_requires=">=3.6",
       classifiers=[
               'Topic :: Software Development :: Libraries',
           'Operating System :: OS Independent',

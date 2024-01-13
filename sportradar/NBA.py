@@ -8,11 +8,16 @@ from sportradar.api import API
 class NBA(API):
 
     def __init__(self, api_key, format_='json', language='en',
-                 access_level='trial', timeout=5, sleep_time=1.5):
-        super().__init__(api_key, format_, timeout, sleep_time)
+                 access_level='trial', timeout=5, version=7, sleep_time=1.5):
+        super().__init__(api_key=api_key, format_=format_, version=version, timeout=timeout, sleep_time=sleep_time)
         self.access_level = access_level
         self.language = language
-        self.version = 7
+        self.version = version
+        self.prefix = 'nba/{level}/v{ver}/{lang}/'.format(
+                        level=self.access_level, ver=self.version, lang=self.language)
+        
+    def set_version(self, version):
+        super().set_version(version=version)
         self.prefix = 'nba/{level}/v{ver}/{lang}/'.format(
                         level=self.access_level, ver=self.version, lang=self.language)
 
@@ -92,6 +97,13 @@ class NBA(API):
             season_year=season_year, season_type=season_type)
         return self._make_request(self.prefix + path)
 
+    def get_seasons(self, season_type=None):
+        path = "league/seasons"
+        self.set_version(8)
+        result = self._make_request(self.prefix + path)
+        self.set_version(self.default_version)
+        return result
+
     def get_seasonal_statistics_season_to_date(self, season_year, season_type, team_id):
         """Provides detailed team and player statistics for the defined season"""
         path = "seasons/{season_year}/{season_type}/teams/{team_id}/statistics".format(
@@ -121,5 +133,8 @@ class NBA(API):
             player roster information.
         """
         path = "teams/{team_id}/profile".format(team_id=team_id)
-        return self._make_request(self.prefix + path)
+        self.set_version(8)
+        result = self._make_request(self.prefix + path)
+        self.set_version(self.default_version)
+        return result
 
