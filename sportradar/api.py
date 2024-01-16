@@ -8,6 +8,7 @@ API details and documentation: https://developer.sportradar.com/io-docs
 
 import requests
 import time
+from merkle_json import MerkleJson
 
 
 class API(object):
@@ -38,6 +39,7 @@ class API(object):
         self.version = version
         self.debug = debug
         self._sleep_time = sleep_time
+        self.hash = None
 
     def _make_request(self, path, method='GET'):
         """Make a GET or POST request to the API"""
@@ -50,6 +52,12 @@ class API(object):
                                         full_uri,
                                         timeout=self.timeout,
                                         params=self.api_key)
+        mj = MerkleJson()
+        if self.FORMAT == 'json' and response:
+            self.hash = mj.hash(response.json())
+        else:
+            # if we need to use something besides JSON, handle it here #
+            self.hash = mj.hash(response.content)
         # response.raise_for_status()  # Raise error for bad status
         return response
 
